@@ -1,0 +1,35 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n =Integer.parseInt(reader.readLine());
+
+            String[] tmp = reader.readLine().split(" ");
+            int[] in = new int[tmp.length];
+            for(int i = 0; i < in.length; i++)
+                in[i] = Integer.parseInt(tmp[i]);
+
+            System.out.println(invCount(in, n));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static long invCount( int[] in , int size) {
+        long count = 0;
+        for (int i = 0; i < size - 1; i++) {
+            for (int j = i + 1; j < size; j++) {
+                if (in[i] > in[j]) {
+                    count++;
+//                    if(count<0)
+//                    System.out.print(count);
+                }
+            }
+        }
+        return count;
+    }
+}

@@ -1,0 +1,69 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E;
+
+    static String negativeCycle(ArrayList<Node> graph) {
+        graph.get(0).dist = 0;
+
+        for (int i = 0; i < V - 1; i++) {
+            for (int u = 0; u < V - 1; u++)
+                for (Node v : graph.get(u).pointsTo) {
+                    int len = graph.get(u).weight.get(v.info);
+                    if (graph.get(u).dist != Integer.MAX_VALUE ) {
+                        if (v.dist > graph.get(u).dist + len){
+                            v.dist = graph.get(u).dist + len;
+                        }
+                    }
+                }
+        }
+
+        for (int u = 0; u < V - 1; u++) {
+            for (Node v : graph.get(u).pointsTo) {
+                int len = graph.get(u).weight.get(v.info);
+                if (graph.get(u).dist != Integer.MAX_VALUE) {
+                    if (v.dist != graph.get(u).dist + len) {
+                        return "1 ";
+                    }
+                }
+            }
+        }
+
+        return "-1 ";
+
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            while (reader.ready()) {
+                String info[] = reader.readLine().split(" ");
+                V = Integer.parseInt(info[0]);
+                E = Integer.parseInt(info[1]);
+                ArrayList<Node> graph = new ArrayList<>();
+
+                for (int i = 0; i < V; i++)
+                    graph.add(new Node(i + 1));
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    int c = Integer.parseInt(edge[2]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graph.get(a - 1).weight.put(b, c);
+                }
+                System.out.print(negativeCycle(graph));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+

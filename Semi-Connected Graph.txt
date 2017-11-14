@@ -1,0 +1,157 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E, order, count;
+
+    static void DFS(ArrayList<Node> graph) {
+        order = 0;
+        for(Node x: graph){
+            if(!x.visited)
+                explore(x);
+        }
+    }
+
+    static void explore(Node u){
+        u.preOrder = order++;
+        u.visited = true;
+        for (Node v : u.pointsTo){
+            if(!v.visited)
+                explore(v);
+        }
+        u.postOrder = order++;
+    }
+
+    static void DFS2(ArrayList<Node> graph, ArrayList<Integer> result) {
+        order = 0;
+        count = 0;
+        for(int i = 0 ; i < result.size();i++){
+            if(!graph.get(result.get(i)-1).visited){
+                explore2(graph.get(result.get(i)-1));
+                count++;
+            }
+        }
+    }
+
+    static void explore2(Node u){
+        u.preOrder = order++;
+        u.visited = true;
+        u.SCCnum = count;
+        for (Node v : u.pointsTo){
+            if(!v.visited)
+                explore2(v);
+        }
+        u.postOrder = order++;
+    }
+
+    static ArrayList<Integer> TS(ArrayList<Node> graph){
+        DFS(graph);
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < graph.size(); i++) {           //topological sort
+            int maxPostIndex = 0;
+            for (int j = 1; j < graph.size(); j++) {
+                if (graph.get(maxPostIndex).postOrder < graph.get(j).postOrder) {
+                    maxPostIndex = j;
+                }
+            }
+            result.add(maxPostIndex + 1);
+            graph.get(maxPostIndex).postOrder = -1;
+        }
+        return result;
+    }
+
+    static void SCC(ArrayList<Node> graph, ArrayList<Node> ReverseGraph) {
+        DFS(ReverseGraph);
+        ArrayList<Integer> result = TS(ReverseGraph);
+        DFS2(graph, result);
+    }
+
+    static void semi(ArrayList<Node> graph, ArrayList<Node> graphorder) {
+        SCC(graph, graphorder);
+        ArrayList<ArrayList<Node>> SCClist = new ArrayList<>();
+        ArrayList<Node> SCCarray = new ArrayList<>();               //new map
+        ArrayList<Node> SCCarrayOrder = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            SCClist.add(new ArrayList<>());
+            SCCarray.add(new Node(i+1));
+            SCCarrayOrder.add(new Node(i+1));
+        }
+
+        for (int i = 0; i < count; i++) {               //put nodes in coresponding SCC
+            for (Node u : graph) {
+                if (i == u.SCCnum) {
+                    SCClist.get(i).add(u);
+                }
+            }
+        }
+
+        for (int i = 0; i < count; i++) {
+            for (Node u : SCClist.get(i)) {
+                for (Node v : u.pointsTo) {
+                    if (v.SCCnum != i) {        //if neighbors of the current node in different SCC, connect ... in SCCarray
+                        SCCarray.get(i).pointsTo.add(SCCarray.get(v.SCCnum));
+                        SCCarrayOrder.get(i).pointsTo.add(SCCarrayOrder.get(v.SCCnum));
+                    }
+                }
+            }
+        }
+
+        hamPath(SCCarray, SCCarrayOrder);
+    }
+
+    static void hamPath(ArrayList<Node> graph, ArrayList<Node> graphorder) {
+        ArrayList<Integer> result = TS(graphorder);
+        boolean has = true;
+        for (int i = 0; i < result.size() - 1; i++) {
+            if (!graph.get(result.get(i) - 1).pointsTo.contains(graph.get(result.get(i + 1) - 1))) {
+                has = false;
+                break;
+            }
+        }
+
+        if(!has){
+            System.out.print("-1 ");
+        }else {
+            System.out.print("1 ");
+        }
+
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+            ArrayList<Node> graph = new ArrayList<>();
+            ArrayList<Node> graphorder = new ArrayList<>();
+            while (reader.ready()) {
+                reader.readLine();
+                String info[] = reader.readLine().split(" ");
+                V = Integer.parseInt(info[0]);
+                E = Integer.parseInt(info[1]);
+
+                for (int i = 0; i < V; i++){
+                    graph.add(new Node(i + 1));
+                    graphorder.add(new Node(i + 1));
+                }
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graphorder.get(a - 1).pointsTo.add(graphorder.get(b - 1));
+                }
+                semi(graph, graphorder);
+                graph.clear();
+                graphorder.clear();
+            }
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

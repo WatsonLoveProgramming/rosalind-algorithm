@@ -1,0 +1,84 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            String[] tmp = reader.readLine().split(" ");
+            int[] in = new int[tmp.length];
+            for (int i = 0; i < in.length; i++)
+                in[i] = Integer.parseInt(tmp[i]);
+
+            int[] out = heapSort(in);
+            for (int i = 0; i < out.length; ++i) {
+                System.out.print(out[i] + " ");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int[] heapSort(int[] in) {
+        int[] heap = buildHeap(in);
+
+        //recursively swap the root and the last node
+        for (int i = heap.length - 1; i >= 1; i--) {
+            int tmp = heap[0];
+            heap[0] = heap[i];
+            heap[i] = tmp;
+
+            int curr = 0;
+            while (true) {
+                int left = -1, right = -1, large = -1;
+                if (2 * curr + 1 < i)
+                    left = 2 * curr + 1;
+                if (2 * curr + 2 < i)
+                    right = 2 * curr + 2;
+
+                //get the larger child
+                if (left == -1 && right == -1) {
+                    break;
+                } else if (left == -1) {
+                    large = right;
+                } else if (right == -1) {
+                    large = left;
+                } else {
+                    if (heap[left] > heap[right])
+                        large = left;
+                    else
+                        large = right;
+                }
+
+                //parent larger than left and right child
+                if (heap[curr] > heap[large])
+                    break;
+
+                //else swap the current node with the larger child
+                tmp = heap[curr];
+                heap[curr] = heap[large];
+                heap[large] = tmp;
+                curr = large;
+            }
+        }
+        return heap;
+    }
+
+    public static int[] buildHeap(int[] in) {
+        int[] heap = new int[in.length];
+        heap[0] = in[0];
+        for (int i = 1; i < in.length; ++i) {
+            heap[i] = in[i];
+            int curr = i;
+            while (curr != 0 && heap[(curr - 1) / 2] < heap[curr]) {
+                int temp = heap[(curr - 1) / 2];
+                heap[(curr - 1) / 2] = heap[curr];
+                heap[curr] = temp;
+                curr = (curr - 1) / 2;
+            }
+        }
+        return heap;
+    }
+}

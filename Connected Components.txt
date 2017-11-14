@@ -1,0 +1,51 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String[] VE = reader.readLine().split(" ");
+            int V = Integer.parseInt(VE[0]);
+            int E = Integer.parseInt(VE[1]);
+
+            //initialize the undirected graph
+            ArrayList<ArrayList<Integer>> gg = new ArrayList<>();
+            for (int i = 0; i <= V; i++)
+                gg.add(new ArrayList<>());
+            while (reader.ready()) {
+                String[] nums = reader.readLine().split(" ");
+                int a = Integer.parseInt(nums[0]);
+                int b = Integer.parseInt(nums[1]);
+                gg.get(a).add(b);
+                gg.get(b).add(a);
+            }
+
+            int count = 0;
+            boolean[] visit = new boolean[V];
+
+            for(int i = 1; i <= V; i++)
+                if(!visit[i - 1]) {
+                    count++;
+                    DFS(i, gg, visit);
+                }
+
+            System.out.println(count);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void DFS( int i, ArrayList<ArrayList<Integer>> gg, boolean[] visit ) {
+        visit[i - 1] = true;
+        ArrayList<Integer> tmp = gg.get(i);
+        for(int x = 0; x < tmp.size(); x++) {
+            int forward = tmp.get(x);
+            if(!visit[forward - 1]) {
+                DFS(forward, gg, visit);
+            }
+        }
+    }
+}

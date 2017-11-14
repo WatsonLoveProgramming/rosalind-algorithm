@@ -1,0 +1,17 @@
+package graph;
+
+import java.util.*;
+
+public class Node{
+    int info;
+    boolean visited = false;
+    Integer dist = Integer.MAX_VALUE;
+    ArrayList<Node> pointsTo = new ArrayList<>();
+    Map<Integer, Integer> weight = new HashMap<>();
+
+    public Node() {}
+
+    public Node(int info) {
+        this.info = info;
+    }
+}

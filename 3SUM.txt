@@ -1,0 +1,72 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String[] L = reader.readLine().split(" ");
+
+            int[][] allArrays = new int[Integer.parseInt(L[0])][];
+            for(int i = 0; i < allArrays.length; i++) {
+                String[] pc = reader.readLine().split(" ");
+                allArrays[i] = new int[pc.length];
+                for(int j = 0; j < pc.length; j++)
+                    allArrays[i][j] = Integer.parseInt(pc[j]);
+            }
+
+            String sumout[] =  sum3(allArrays);
+            for(int i = 0; i < sumout.length; i++) {
+                System.out.println(sumout[i]);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static String[] sum3( int[][] allArrays ) {
+        String[] out = new String[allArrays.length];
+        for(int curr = 0; curr < allArrays.length; curr++) {
+            int[] currentArray = new int[allArrays[curr].length];
+            for(int i = 0; i < allArrays[curr].length; i++)
+                currentArray[i] = allArrays[curr][i];
+            Arrays.sort(currentArray);   // Sorts the array into ascending order
+
+            boolean found = false;
+            for(int i = 0; i < currentArray.length-2; i++) {
+                int first = i + 1, last = currentArray.length - 1, a = currentArray[i];
+
+                while (first < last) {
+                    //calculate the sum
+                    int before = currentArray[first], after = currentArray[last], sum = a + before + after;
+                    if (sum == 0) {
+                        int[] index = new int[3];
+                        for (int j = 0; j < currentArray.length; j++) {
+                            if (allArrays[curr][j] == currentArray[i])
+                                index[0] = j + 1;
+                            if (allArrays[curr][j] == currentArray[first])
+                                index[1] = j + 1;
+                            if (allArrays[curr][j] == currentArray[last])
+                                index[2] = j + 1;
+                        }
+                        Arrays.sort(index);
+                        out[curr] = index[0] + " " + index[1] + " " + index[2];
+                        found = true;
+                        break;
+                    } else if (sum > 0)
+                        last--;
+                    else
+                        first++;
+                }
+                if (found)
+                    break;
+            }
+
+            if(!found)
+                out[curr] = "-1";
+        }
+
+        return out;
+    }
+}

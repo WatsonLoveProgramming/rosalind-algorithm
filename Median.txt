@@ -1,0 +1,67 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            String[] tmp = reader.readLine().split(" ");
+            int[] in = new int[tmp.length];
+            for (int i = 0; i < in.length; i++)
+                in[i] = Integer.parseInt(tmp[i]);
+
+            int[] out = divide(in);
+
+            int median = Integer.parseInt(reader.readLine());
+            System.out.print(out[median - 1]);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int[] divide( int[] mergein ) {
+        if(mergein.length == 1)
+            return mergein;
+        else {
+            int[] a = new int[mergein.length / 2];
+            int[] b = new int[mergein.length - a.length];
+            int x = 0;
+            for(int i = 0; i < a.length; i++)
+                a[i] = mergein[x++];
+            for(int i = 0; i < b.length; i++)
+                b[i] = mergein[x++];
+            int[] a1 = divide(a);       //partition left part
+            int[] b1 = divide(b);       //partition right part
+            return mergeArrays(a1,b1);      //merge two part
+        }
+    }
+
+    public static int[] mergeArrays( int[] aa, int[] bb ) {
+        int result[] = new int[aa.length + bb.length];
+        int x = 0, xA = 0, xB = 0;
+
+        if(aa.length == 0)
+            return bb;
+        if(bb.length == 0)
+            return aa;
+
+        while(xA < aa.length && xB < bb.length)     //two subarrays not full
+            if(aa[xA] < bb[xB])
+                result[x++] = aa[xA++];
+            else
+                result[x++] = bb[xB++];
+
+        if(xA == aa.length && xB != bb.length)      //one of the two subarrays not full
+            while(xB < bb.length)
+                result[x++] = bb[xB++];
+        else if(xA != aa.length && xB == bb.length)
+            while(xA < aa.length)
+                result[x++] = aa[xA++];
+
+
+        return result;
+    }
+}

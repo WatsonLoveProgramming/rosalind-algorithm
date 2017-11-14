@@ -1,0 +1,87 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E, order;
+    static int count;
+    static void DFS(ArrayList<Node> graph) {
+        order = 0;
+        for(Node x: graph){
+            if(!x.visited)
+                explore(x);
+        }
+    }
+
+    static void DFS2(ArrayList<Node> graph, ArrayList<Integer> result) {
+        order = 0;
+        count = 0;
+        for(int i = 0 ; i < result.size();i++){
+            if(!graph.get(result.get(i)-1).visited){
+                explore(graph.get(result.get(i)-1));
+                count++;
+            }
+        }
+        System.out.print(count);
+    }
+
+    static void explore(Node u){
+        u.preOrder = order++;
+        u.visited = true;
+        for (Node v : u.pointsTo){
+            if(!v.visited)
+                explore(v);
+        }
+        u.postOrder= order++;
+    }
+
+    static void SCC(ArrayList<Node> graph, ArrayList<Node> ReverseGraph) {
+        DFS(ReverseGraph);
+        ArrayList<Integer> result = new ArrayList<>();
+
+        for (int i = 0; i < V; i++) {
+            int maxPostIndex = 0;
+            for (int j = 1; j < V; j++) {
+                if (ReverseGraph.get(maxPostIndex).postOrder < ReverseGraph.get(j).postOrder) {
+                    maxPostIndex = j;
+                }
+            }
+            result.add(maxPostIndex + 1);
+            ReverseGraph.get(maxPostIndex).postOrder = -1;
+        }
+
+        DFS2(graph,result);
+
+    }
+
+
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String info[] = reader.readLine().split(" ");
+            V = Integer.parseInt(info[0]);
+            E = Integer.parseInt(info[1]);
+            ArrayList<Node> graph = new ArrayList<>();
+            ArrayList<Node> ReverseGraph = new ArrayList<>();
+            while (reader.ready()) {
+                for (int i = 0; i < V; i++) {
+                    graph.add(new Node(i + 1));
+                    ReverseGraph.add(new Node(i + 1));
+                }
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    ReverseGraph.get(b - 1).pointsTo.add(ReverseGraph.get(a - 1));
+                }
+                SCC(graph, ReverseGraph);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

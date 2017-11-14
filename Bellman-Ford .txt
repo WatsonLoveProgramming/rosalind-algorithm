@@ -1,0 +1,69 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E;
+
+    static PriorityQueue<Node> PQ = new PriorityQueue<>(new Comparator<Node>() {
+        @Override
+        public int compare(Node o1, Node o2) {
+            return o1.dist.compareTo(o2.dist);
+        }
+    });
+
+    static void bellman(ArrayList<Node> graph) {
+        graph.get(0).dist = 0;
+
+
+        for (int i = 0; i < V - 1; i++) {
+            for (int j = 0; j < V - 1; j++)
+            for (Node v : graph.get(j).pointsTo) {
+                int len = graph.get(j).weight.get(v.info);
+                if (graph.get(j).dist != Integer.MAX_VALUE ) {
+                    if (v.dist.compareTo(graph.get(j).dist + len) == 1){
+                        v.dist = graph.get(j).dist + len;
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String info[] = reader.readLine().split(" ");
+            V = Integer.parseInt(info[0]);
+            E = Integer.parseInt(info[1]);
+            ArrayList<Node> graph = new ArrayList<>();
+
+            while (reader.ready()) {                        //initialize the graph and weights
+                for (int i = 0; i < V; i++)
+                    graph.add(new Node(i + 1));
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    int c = Integer.parseInt(edge[2]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graph.get(a - 1).weight.put(b, c);
+                }
+            }
+
+            bellman(graph);
+
+            for (Node i : graph) {
+                if (i.dist == Integer.MAX_VALUE)
+                    System.out.print("x ");
+                else
+                    System.out.print(i.dist + " ");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

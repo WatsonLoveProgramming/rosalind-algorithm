@@ -1,0 +1,44 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static boolean[] visited;
+    public static ArrayList<ArrayList<Integer>> graph;
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String[] VE = reader.readLine().split(" ");
+            int V = Integer.parseInt(VE[0]);
+            int E = Integer.parseInt(VE[1]);
+
+            graph = new ArrayList<>();
+            for (int i = 0; i <= V; i++)
+                graph.add(new ArrayList<>());
+            while (reader.ready()) {
+                String[] nums = reader.readLine().split(" ");
+                int a = Integer.parseInt(nums[0]);
+                int b = Integer.parseInt(nums[1]);
+                graph.get(a).add(b);
+                graph.get(b).add(a);
+            }
+
+            visited = new boolean[V];
+
+            for(int i = 0; i < V; i++)
+                if(visited[i] == false)
+                    explore(graph.get(i), i);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void explore(ArrayList<Integer> V, int curr) {
+        visited[curr] = true;
+        for(int i = 0; i < V.size(); i++)
+            if (visited[V.get(i)] == false)
+                explore(graph.get(i), V.get(i));
+    }
+}

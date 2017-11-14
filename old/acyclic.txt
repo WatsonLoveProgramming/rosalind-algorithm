@@ -1,0 +1,63 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+    private static ArrayList<ArrayList<Integer>> graph;
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            while (reader.ready()) {
+                reader.readLine();
+                String info[] = reader.readLine().split(" ");
+                int V = Integer.parseInt(info[0]);
+                int E = Integer.parseInt(info[1]);
+                graph = new ArrayList<>();
+                for (int i = 0; i <= V; i++)
+                    graph.add(new ArrayList<>());
+                for (int i = 0; i < E; i++) {
+                    String[] nums = reader.readLine().split(" ");
+                    int a = Integer.parseInt(nums[0]);
+                    int b = Integer.parseInt(nums[1]);
+                    graph.get(a).add(b);
+                }
+                System.out.print(DFS(V));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String DFS(int V) {
+        boolean[] visited = new boolean[V];
+        for (int i = 0; i < V; i++)
+            visited[i] = false;
+        for (int i = 1; i <= V; i++)
+            if (!visited[i - 1])          //i-1 mean the first node, since the array index from 0
+                if (cycleCheck(i, visited, -1)) {
+                    return "-1 ";
+                }else {
+                    break;
+                }
+        return "1 ";
+    }
+
+    public static boolean cycleCheck(int i, boolean[] visited, int father) {
+        visited[i - 1] = true;
+        ArrayList<Integer> tmp = graph.get(i);      //this node's arraylist (node start from 1) -> all v in <u,v>
+
+        for(int x = 0; x < tmp.size(); x++) {
+            int next = tmp.get(x);
+            if(!visited[next - 1]){
+                if (cycleCheck(next, visited, i))
+                    return true;
+            }else {
+                if (next != father)
+                    return true;
+            }
+        }
+        return false;
+    }
+}

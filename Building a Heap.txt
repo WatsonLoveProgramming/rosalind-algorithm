@@ -1,0 +1,42 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            String[] in = reader.readLine().split(" ");
+            int heapin[] = new int[n];
+            for(int i = 0; i < n; i++)
+                heapin[i] = Integer.parseInt(in[i]);
+
+            int[] heapout = new int[n];
+            heapout[0] = heapin[0];
+            for(int i = 1; i < n; i++) {
+                heapout[i] = heapin[i];
+                int curr = i;
+                while(curr != 0 && heapout[(int)Math.ceil(curr/2.0) - 1] < heapout[curr]) {
+                    //System.out.println( (int)Math.floor(curr/2.0)+" " + curr);
+                    int tmp = heapout[(int)Math.ceil(curr/2.0) - 1];
+                    heapout[(int)Math.ceil(curr/2.0) - 1] = heapout[curr];
+                    heapout[curr] = tmp;
+                    curr = (int)Math.ceil(curr/2.0) - 1;
+                    //System.out.println((int)Math.floor(curr/2.0) +" after " +  curr);
+
+                }
+            }
+
+            for(int i = 0; i < n; i++) {
+                System.out.print(heapout[i] + " ");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+}

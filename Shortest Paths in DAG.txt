@@ -1,0 +1,102 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E, order;
+
+    static void dagShortestPath(ArrayList<Node> graph, ArrayList<Node> graphorder) {
+        ArrayList<Integer> result = TS(graphorder);
+        graph.get(0).dist = 0;
+
+        for (int i = 0; i < result.size(); i++) {
+            int u =result.get(i) - 1;
+
+                for (Node v : graph.get(u).pointsTo) {
+                    int len = graph.get(u).weight.get(v.info);
+                    if (graph.get(u).dist != Integer.MAX_VALUE) {
+                        if (v.dist > graph.get(u).dist + len) {
+                            v.dist = graph.get(u).dist + len;
+                        }
+                    }
+                }
+
+
+
+        }
+    }
+
+    static void DFS(ArrayList<Node> graph) {
+        order = 0;
+        for(Node x: graph){
+            if(!x.visited)
+                explore(x);
+        }
+    }
+
+    static void explore(Node u){
+        u.preOrder = order++;
+        u.visited = true;
+        for (Node v : u.pointsTo){
+            if(!v.visited)
+                explore(v);
+        }
+        u.postOrder= order++;
+    }
+
+    static ArrayList<Integer> TS(ArrayList<Node> graphorder) {
+        DFS(graphorder);
+        ArrayList<Integer> result = new ArrayList<>();
+
+        for (int i = 0; i < V; i++) {
+            int maxPostIndex = 0;
+            for (int j = 1; j < V; j++) {
+                if (graphorder.get(maxPostIndex).postOrder < graphorder.get(j).postOrder) {
+                    maxPostIndex = j;
+                }
+            }
+            result.add(maxPostIndex + 1);
+            graphorder.get(maxPostIndex).postOrder = -1;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String info[] = reader.readLine().split(" ");
+            V = Integer.parseInt(info[0]);
+            E = Integer.parseInt(info[1]);
+            ArrayList<Node> graph = new ArrayList<>();
+            ArrayList<Node> graphorder = new ArrayList<>();
+            while (reader.ready()) {                        //initialize the graph and weights
+                for (int i = 0; i < V; i++){
+                    graph.add(new Node(i + 1));
+                    graphorder.add(new Node(i + 1));
+                }
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    int c = Integer.parseInt(edge[2]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graph.get(a - 1).weight.put(b, c);
+                    graphorder.get(a - 1).pointsTo.add(graphorder.get(b - 1));
+                }
+            }
+
+            dagShortestPath(graph, graphorder);
+
+            for (Node i : graph) {
+                if (i.dist == Integer.MAX_VALUE)
+                    System.out.print("x ");
+                else
+                    System.out.print(i.dist + " ");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

@@ -1,0 +1,49 @@
+import java.io.IOException;
+import FILE.ReadFile;
+import util.Stack;
+import graph.Graph;
+
+public class cc{
+    public static void main(String[] args) throws IOException{
+	String filename = "../DATA/rosalind_cc.txt";
+	ReadFile file = new ReadFile(filename);
+	String[] lines = file.OpenFile();
+	
+	String[] nodeEdgeNum = lines[0].split(" ");
+	int nodeNum = Integer.parseInt(nodeEdgeNum[0]);
+	
+	Graph gg= new Graph((nodeNum+1));
+	
+	for (int i=1; i<lines.length; i++) {
+	    String[] edgeLine = lines[i].split(" ");
+	    int from = Integer.parseInt(edgeLine[0]);
+	    int to  = Integer.parseInt(edgeLine[1]);
+	    gg.addEdge(from, to);
+	}
+	
+	Stack<Integer> nodeStack = new Stack<Integer>();
+	int cnt = 0;
+	for (int i=1; i<=nodeNum; i++) {
+	    if(gg.isVisited(i) == false) {
+		gg.setVisited(i);
+		nodeStack.push(i);
+		while(nodeStack.isEmpty() == false) {
+		    int v = gg.getUnvisitedAdjNode( nodeStack.peek() );
+		    
+		    if ( v == -1) {
+			nodeStack.pop();
+		    } else {
+			gg.setVisited(v);
+			nodeStack.push(v);
+		    }
+		}
+		cnt++;
+	    } 
+
+	}
+	System.out.println(cnt);
+
+    }
+
+ 
+}

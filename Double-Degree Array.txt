@@ -1,0 +1,36 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static void main(String[] args) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+             FileWriter writer = new FileWriter(new File("output.txt"))) {
+            String[] nums = reader.readLine().split(" ");
+            int V = Integer.parseInt(nums[0]);
+            HashSet<Integer>[] result = new HashSet[V + 1];
+            for (int i = 0; i < V + 1; i++) {
+                result[i] = new HashSet();
+            }
+            while (reader.ready()) {
+                String myline[] = reader.readLine().split(" ");
+                int a = Integer.parseInt(myline[0]);
+                int b = Integer.parseInt(myline[1]);
+                result[a].add(b);
+                result[b].add(a);
+            }
+            for (int i = 1; i <= V; i++) {
+                int nds = 0;
+                Iterator<Integer> iterator = result[i].iterator();
+                while (iterator.hasNext()) {
+                    nds += result[iterator.next()].size();
+                }
+                writer.write(nds + " ");
+                writer.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+}

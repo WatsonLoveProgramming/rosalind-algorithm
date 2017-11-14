@@ -1,0 +1,176 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int clock = 1;
+    static boolean visited[];
+    static int cc = 1;
+    static int ccnum[];
+    static int pre[], post[];
+
+    static void preVisit(int v, int[] pre){
+        pre[v] = clock;
+        ccnum[v] = cc;
+        clock++;
+    }
+    static void postVisit(int v, int[] post){
+        post[v] = clock;
+        clock++;
+    }
+    static void explore(ArrayList<ArrayList<Integer>> graph, int v, boolean[] visited, int[] pre, int[] post){
+        visited[v] = true;
+        preVisit(v, pre);
+        while (!graph.get(v).isEmpty()){
+            for (Integer u: graph.get(v))
+            if (!visited[u])
+                explore(graph, u, visited, pre, post);
+            graph.get(v).remove(0);
+        }
+        postVisit(v, post);
+    }
+
+    static void DFS(ArrayList<ArrayList<Integer>> graph, boolean[] visited, int vertex, int[] pre, int[] post){
+        for (int i = 0; i < vertex; i++){
+            visited[i] = false;
+        }
+        for (int i = 0; i < vertex; i++){
+            if (!visited[i]){
+                explore(graph, i, visited, pre, post);
+            }
+        }
+    }
+
+    static void modifiedDFS(ArrayList<ArrayList<Integer>> graph, boolean[] visited, int vertex, int[] pre, int[] post, int[] order){
+        for (int i = 0; i < vertex; i++){
+            visited[i] = false;
+        }
+        for (int i = 0; i < vertex; i++){
+            if (!visited[order[i]]){
+                explore(graph, order[i], visited, pre, post);
+                cc++;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+            int count = 0;
+            while (count<n) {
+                reader.readLine();
+                clock =1;
+                boolean flag = false;
+                String info[] = reader.readLine().split(" ");
+                int V = Integer.parseInt(info[0]);
+                int E = Integer.parseInt(info[1]);
+                V*=2;
+                ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
+                ArrayList<ArrayList<Integer>> revGraph = new ArrayList<>();
+                ccnum = new int[V];
+                int scount= 0;
+
+                while (scount < E){
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+
+                    for (int i = 0; i < V; i++) {
+                        graph.add(new ArrayList<>());
+                        revGraph.add(new ArrayList<>());
+                    }
+
+                    if (a < 0 && b < 0){
+                        graph.get(V / 2 - a - 1).add(b + V / 2);
+                        graph.get(V / 2 - b - 1).add(a + V / 2);
+                        revGraph.get(b + V / 2).add(V / 2 - a - 1);
+                        revGraph.get(a + V / 2).add(V / 2 - b - 1);
+                    }
+                    else if (a > 0 && b < 0){
+                        graph.get(V / 2 - a).add(b + V / 2);
+                        graph.get(V / 2 - b - 1).add(a + V / 2 - 1);
+                        revGraph.get(b + V / 2).add(V / 2 - a);
+                        revGraph.get(a + V / 2 - 1).add(V / 2 - b - 1);
+                    }
+                    else if (a < 0 && b > 0){
+                        graph.get(V / 2 - a - 1).add(b + V / 2 - 1);
+                        graph.get(V / 2 - b).add(a + V / 2);
+                        revGraph.get(b + V / 2 - 1).add(V / 2 - a - 1);
+                        revGraph.get(a + V / 2).add(V / 2 - b);
+                    }
+                    else{
+                        graph.get(V / 2 - a).add(b + V / 2 - 1);
+                        graph.get(V / 2 - b).add(a + V / 2 - 1);
+                        revGraph.get(b + V / 2 - 1).add(V / 2 - a);
+                        revGraph.get(a + V / 2 - 1).add(V / 2 - b);
+                    }
+                    scount++;
+                }
+
+                visited = new boolean[V];
+                pre = new int[V];
+                post = new int[V];
+		        int order[] = new int[V];
+
+                //SCC algorithm
+                DFS(revGraph, visited, V, pre, post);
+                int max;
+                int maxIndex = 0;
+                int k = 0;
+                while (k < V){
+                    max = -1;
+                    for (int i = 0; i < V; i++){
+                        if (post[i] > max){
+                            max = post[i];
+                            maxIndex = i;
+                        }
+                    }
+                    post[maxIndex] = 0;
+                    order[k] = maxIndex;
+                    k++;
+                }
+
+                clock = 1;
+                modifiedDFS(graph, visited, V, pre, post, order);
+
+                //Feasibility
+                for (int i = 0; i < V / 2; i++){
+                    if (ccnum[i] == ccnum[V - 1 - i])
+                        flag = true;
+                }
+
+                boolean[] assign = new boolean[V];
+                if (flag)
+                    System.out.println("0");
+                else{
+                    System.out.print("1 ");
+
+                    for (int i = cc - 1; i >= 1; i--){
+                        for (int j = 0; j < V; j++){
+                            if (ccnum[j] == i){
+                                assign[j] = true;
+                                assign[V - 1 - j] = false;
+                            }
+                        }
+                    }
+
+                    for (int i = V / 2; i < V; i++){
+                        if (assign[i])
+                            System.out.print( i + 1 - V / 2 + " ");
+
+                        if (assign[V - 1 - i])
+                            System.out.print( V / 2 -i - 1 + " ");
+                    }
+                    System.out.println();
+                }
+
+                count++;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

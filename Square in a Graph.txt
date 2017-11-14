@@ -1,0 +1,55 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E;
+
+    static ArrayList<Node> findCommon(Node x, Node y) {
+        ArrayList<Node> collection = new ArrayList<>();
+        for (Node common : x.pointsTo)
+            if (y.pointsTo.contains(common) && !collection.contains(common))
+                collection.add(common);
+        return collection;
+    }
+
+    static int findSquare(ArrayList<Node> gg) {
+        for (int i = 0; i < gg.size() - 1; i++)
+            for (int j = i + 1; j < gg.size(); j++) {
+                int count = findCommon(gg.get(i), gg.get(j)).size();
+                if (count >= 2)
+                    return 1;
+            }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+            ArrayList<Node> graph = new ArrayList<>();
+            while (reader.ready()) {
+                reader.readLine();
+                String info[] = reader.readLine().split(" ");
+                V = Integer.parseInt(info[0]);
+                E = Integer.parseInt(info[1]);
+
+                for (int i = 0; i < V; i++) {
+                    graph.add(new Node(i + 1));
+                }
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graph.get(b - 1).pointsTo.add(graph.get(a - 1));
+                }
+                System.out.print(findSquare(graph) + " ");
+                graph.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

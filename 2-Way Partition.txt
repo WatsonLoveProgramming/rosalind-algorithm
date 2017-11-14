@@ -1,0 +1,51 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            String[] tmp = reader.readLine().split(" ");
+            int[] in = new int[tmp.length];
+            for (int i = 0; i < in.length; i++)
+                in[i] = Integer.parseInt(tmp[i]);
+
+            int[] out = part3(in);
+            for (int i = 0; i < out.length; ++i) {
+                System.out.print(out[i] + " ");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int[] part3( int[] in ) {
+        int q = in[0], equal = 1;
+        ArrayList<Integer> before = new ArrayList<Integer>();
+        ArrayList<Integer> after = new ArrayList<Integer>();
+
+        //sort...
+        for(int i = 1; i < in.length; i++) {
+            if(in[i] == q)
+                equal++;
+            else if(in[i] > q)
+                after.add(in[i]);
+            else
+                before.add(in[i]);
+        }
+
+        int[] out = new int[in.length];
+        int x = 0;
+
+        //combine the before, equal, and after arraylist
+        for(int i = 0; i < before.size(); i++)
+            out[x++] = before.get(i);
+        for(int i = 0; i < equal; ++i)
+            out[x++] = q;
+        for(int i = 0; i < after.size(); ++i)
+            out[x++] = after.get(i);
+        return out;
+    }
+}

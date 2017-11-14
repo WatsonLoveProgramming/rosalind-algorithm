@@ -1,0 +1,82 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static boolean isBipart;
+    public static boolean aaa[];
+    public static boolean bbb[];
+    public static HashSet<Integer> adjList[];
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            while (reader.ready()) {
+                reader.readLine();
+                String info[] = reader.readLine().split(" ");
+                int V = Integer.parseInt(info[0]);
+                int E = Integer.parseInt(info[1]);
+                adjList = new HashSet[V + 1];
+                for (int i = 0; i < V + 1; i++)
+                    adjList[i] = new HashSet();
+                for (int i = 0; i < E; i++) {
+                    String str[] = reader.readLine().split(" ");
+                    int a = Integer.parseInt(str[0]);
+                    int b = Integer.parseInt(str[1]);
+                    adjList[a].add(b);
+                    adjList[b].add(a);
+                }
+                bipartTest(adjList, V, E);
+
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void bipartTest(HashSet<Integer> adjList[], int V, int E) {
+        isBipart = true;
+        aaa = new boolean[V + 1];
+        aaa[0] = true;
+        bbb = new boolean[V + 1];
+        bbb[0] = true;
+        Iterator<Integer> it = adjList[1].iterator();
+
+        while (it.hasNext()) {
+            int next = it.next();
+            //System.out.print(mark[next]);
+            if (!aaa[next]) {
+                aaa[next] = true;
+                bbb[next] = !bbb[0];
+                //resursively search...
+                search(next);
+            }
+
+            if (!isBipart){
+                System.out.print("-1 ");
+                break;
+            }
+        }
+        if (isBipart)
+            System.out.print("1 ");
+    }
+
+    public static void search(int V) {
+        Iterator<Integer> it = adjList[V].iterator();
+        while (it.hasNext()) {
+            int next = it.next();
+            if (!aaa[next]) {
+                aaa[next] = true;
+                bbb[next] = !bbb[V];
+                search(next);
+            } else if (bbb[next] == bbb[V])
+                isBipart = false;
+            if (!isBipart)
+                return;
+        }
+    }
+}

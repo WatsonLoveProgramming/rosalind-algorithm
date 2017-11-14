@@ -1,0 +1,53 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+
+            String[] tmp = reader.readLine().split(" ");
+            int[] in = new int[tmp.length];
+            for (int i = 0; i < in.length; i++)
+                in[i] = Integer.parseInt(tmp[i]);
+
+            quickSort(in, 0, n - 1);
+            for (int i = 0; i < in.length; i++)
+                System.out.print(in[i] + " ");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int partition(int arr[], int left, int right) {
+        int i = left, j = right, tmp;
+        int p = arr[(left + right) / 2];
+
+        while (i <= j) {
+            while (arr[i] < p)
+                i++;
+            while (arr[j] > p)
+                j--;
+
+            //swap
+            if (i <= j) {
+                tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+                i++;
+                j--;
+            }
+        }
+        return i;
+    }
+
+    public static void quickSort(int arr[], int left, int right) {
+        int tmp = partition(arr, left, right);
+        if (left < tmp - 1)
+            quickSort(arr, left, tmp - 1);
+        if (tmp < right)
+            quickSort(arr, tmp, right);
+    }
+}

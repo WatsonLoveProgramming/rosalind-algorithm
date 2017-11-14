@@ -1,0 +1,81 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String[] VE = reader.readLine().split(" ");
+            int V = Integer.parseInt(VE[0]);
+            int E = Integer.parseInt(VE[1]);
+            int[][] gg = new int[E][2];
+            int max = 0;
+            int x = 0;
+            while (reader.ready()) {
+                String[] nums = reader.readLine().split(" ");
+                gg[x][0] = Integer.parseInt(nums[0]);
+                gg[x][1] = Integer.parseInt(nums[1]);
+                if (gg[x][0] > max) {
+                    max = gg[x][0];
+                }
+                if (gg[x][1] > max) {
+                    max = gg[x][1];
+                }
+                x++;
+            }
+            //initialize the distance
+            int[] dis = new int[max];
+            for (int i = 1; i < dis.length; ++i) {
+                dis[i] = 99999999;
+            }
+
+            //initialize the graph
+            ArrayList<ArrayList<Integer>> bfsgraph = new ArrayList<>();
+            for (int i = 0; i <= max; i++) {
+                bfsgraph.add(new ArrayList<>());
+            }
+            for (int i = 0; i < gg.length; i++) {
+                bfsgraph.get(gg[i][0]).add(gg[i][1]);
+            }
+
+
+            boolean[] visit = new boolean[max];
+            LinkedList<Integer> a = new LinkedList<>();
+            LinkedList<Integer> b = new LinkedList<>();
+            a.add(1);
+            b.add(0);
+            while (!a.isEmpty()) {
+                //mark as visit
+                int current = a.removeFirst();
+                int d = b.removeFirst();
+                visit[current - 1] = true;
+
+                //update distance
+                if (dis[current - 1] > d)
+                    dis[current - 1] = d;
+                ArrayList<Integer> result = bfsgraph.get(current);
+
+
+                for (int i = 0; i < result.size(); i++)
+                    if (!visit[result.get(i) - 1]) {
+                        a.addLast(result.get(i));
+                        b.addLast(d + 1);
+                    }
+            }
+            for (int i = 0; i < visit.length; i++) {
+                if (!visit[i]) {
+                    dis[i] = -1;
+                }
+            }
+
+            for (int i = 0; i < dis.length; i++) {
+                System.out.print(dis[i] + " ");
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

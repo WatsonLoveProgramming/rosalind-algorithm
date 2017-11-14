@@ -1,0 +1,108 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E, clk;
+    static boolean cycle = false;
+    static Node edgeleft, edgeright;
+    static int  edgelen;
+    static int len;
+
+    static PriorityQueue<Node> PQ = new PriorityQueue<>(new Comparator<Node>() {
+        @Override
+        public int compare(Node o1, Node o2) {
+            return o1.dist.compareTo(o2.dist);
+        }
+    });
+
+    static void dijkstra(ArrayList<Node> graph) {
+        graph.get(edgeright.info-1).dist = 0;
+
+        for (Node n : graph)                                        //makequeue
+            PQ.add(n);
+
+        while (!PQ.isEmpty()) {
+            Node u = PQ.poll();                                     //deletemin
+            for (Node v : u.pointsTo) {
+                int len = u.weight.get(v.info);
+                if (u.dist != Integer.MAX_VALUE && v.dist.compareTo(u.dist + len) == 1) {
+                    v.dist = u.dist + len;
+                    ArrayList<Node> tmp = new ArrayList<>();       //decreasekey
+                    while (PQ.isEmpty() == false)
+                        tmp.add(PQ.poll());
+                    while (tmp.isEmpty() == false)
+                        PQ.add(tmp.remove(0));
+                }
+            }
+        }
+
+        if(graph.get(edgeleft.info-1).dist != Integer.MAX_VALUE )
+            System.out.print( graph.get(edgeleft.info-1).dist + edgelen + " ");
+        else
+            System.out.print("-1 ");
+
+
+    }
+
+    static void DFS(ArrayList<Node> graph) {
+        clk = 0;
+        for (Node x : graph) {
+            if (!x.visited)
+                explore(x);
+        }
+
+        for (Node u : graph) {
+            for (Node v : u.pointsTo)
+                if (v.preOrder < u.preOrder && u.postOrder < v.postOrder) {
+                    cycle = true;
+                }
+        }
+    }
+
+    static void explore(Node u) {
+        u.preOrder = clk++;
+        u.visited = true;
+        for (Node v : u.pointsTo) {
+            if (!v.visited)
+                explore(v);
+        }
+        u.postOrder = clk++;
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            int n = Integer.parseInt(reader.readLine());
+            ArrayList<Node> graph = new ArrayList<>();
+            while (reader.ready()) {
+                String info[] = reader.readLine().split(" ");
+                V = Integer.parseInt(info[0]);
+                E = Integer.parseInt(info[1]);
+
+                String givenEdge[] = reader.readLine().split(" ");
+                edgeleft = new Node(Integer.parseInt(givenEdge[0]));
+                edgeright = new Node(Integer.parseInt(givenEdge[1]));
+                edgelen = Integer.parseInt(givenEdge[2]);
+
+                for (int i = 0; i < V; i++)
+                    graph.add(new Node(i + 1));
+                for (int i = 0; i < E - 1; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    int c = Integer.parseInt(edge[2]);
+
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graph.get(a - 1).weight.put(b, c);
+                }
+
+                dijkstra(graph);
+                graph.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

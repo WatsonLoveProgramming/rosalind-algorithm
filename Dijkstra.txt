@@ -1,0 +1,74 @@
+package graph;
+
+import java.util.*;
+import java.io.*;
+
+public class test {
+    static int V, E;
+
+    static PriorityQueue<Node> PQ = new PriorityQueue<>(new Comparator<Node>() {
+        @Override
+        public int compare(Node o1, Node o2) {
+            return o1.dist.compareTo(o2.dist);
+        }
+    });
+
+    static void dijkstra(ArrayList<Node> graph) {
+        graph.get(0).dist = 0;
+
+        for (Node n : graph)                                        //makequeue
+            PQ.add(n);
+
+        while (!PQ.isEmpty()) {
+            Node u = PQ.poll();                                     //deletemin
+
+            for (Node v : u.pointsTo) {
+                int len = u.weight.get(v.info);
+                if (u.dist != Integer.MAX_VALUE && v.dist.compareTo(u.dist + len) == 1) {
+                    v.dist = u.dist + len;
+
+                    ArrayList<Node> tmp = new ArrayList<>();       //decreasekey
+                    while (PQ.isEmpty() == false)
+                        tmp.add(PQ.poll());
+                    while (tmp.isEmpty() == false)
+                        PQ.add(tmp.remove(0));
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            String info[] = reader.readLine().split(" ");
+            V = Integer.parseInt(info[0]);
+            E = Integer.parseInt(info[1]);
+            ArrayList<Node> graph = new ArrayList<>();
+
+            while (reader.ready()) {                        //initialize the graph and weights
+                for (int i = 0; i < V; i++)
+                    graph.add(new Node(i + 1));
+                for (int i = 0; i < E; i++) {
+                    String[] edge = reader.readLine().split(" ");
+                    int a = Integer.parseInt(edge[0]);
+                    int b = Integer.parseInt(edge[1]);
+                    int c = Integer.parseInt(edge[2]);
+                    graph.get(a - 1).pointsTo.add(graph.get(b - 1));
+                    graph.get(a - 1).weight.put(b, c);
+                }
+            }
+
+            dijkstra(graph);
+
+            for (Node i : graph) {
+                if (i.dist == Integer.MAX_VALUE)
+                    System.out.print("-1 ");
+                else
+                    System.out.print(i.dist + " ");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
